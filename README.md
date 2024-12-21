@@ -1,2 +1,1 @@
-# ml_algorithms
-This repo contains classic machine learning algorithms
+В данном репозитории будут находится алгоритмы машинного обучения, которые я написал сам. 
