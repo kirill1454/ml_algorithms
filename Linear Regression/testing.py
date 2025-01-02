@@ -23,7 +23,7 @@ y_test = pd.Series(y_test)
 x_test.columns = [f'col_{col}' for col in x_test.columns]
 
 
-a = MyLineReg(n_iter=130, learning_rate=0.03, metric='mae')
+a = MyLineReg(n_iter=130, learning_rate=lambda iter: 0.5 * (0.85 ** iter))
 a.fit(x_train, y_train, verbose=10)
-print(a.get_best_score())
+
 
