@@ -2,6 +2,7 @@ import pandas as pd
 import numpy as np
 from math import sqrt
 from typing import Callable
+import random
 
 
 class MyLineReg:
@@ -12,7 +13,9 @@ class MyLineReg:
                  metric: str = 'mse',
                  reg: str = None,
                  l1_coef: float = 0,
-                 l2_coef: float = 0.3):
+                 l2_coef: float = 0.3,
+                 sgd_sample: float = None,
+                 random_state: int = 42):
         """
         Функция инициализирует объект класса
 
@@ -24,6 +27,7 @@ class MyLineReg:
         self.lr = learning_rate
         self.weights = weights
 
+        self.x_train = None
         self.y_train = None
         self.y_pred = None
         self.n_rows = None
@@ -34,9 +38,13 @@ class MyLineReg:
         else:
             self.metric = metric
 
+        # Атрибуты регуляризации
         self.reg = reg
         self.l1_coef = l1_coef
         self.l2_coef = l2_coef
+
+        self.rs = random_state
+        self.sgd_sample = sgd_sample
 
     def fit(self, x_train, y_train, verbose=False) -> None:
         """
@@ -48,18 +56,40 @@ class MyLineReg:
         :param verbose: Вывод лога обучения
         :return: None
         """
+        # Добавление фиктивного столбца
         x_train.insert(0, 'col_ones', 1)
+
+        # Количество строк/столбцов датасета
         n_cols = x_train.shape[1]
         n_rows = x_train.shape[0]
+
         x_train = x_train.to_numpy()
+        y_train = y_train.to_numpy()
+
+        # Изначальные веса
         self.weights = [1 for _ in range(n_cols)]
 
+        random.seed(self.rs)
+
         for i in range(1, self.n_iter + 1):
-            y_pred = np.dot(x_train, self.weights)
-            residuals = y_pred - y_train
+
+            # Случай стохастического градиентного спуска
+            if self.sgd_sample is not None:
+                sample_rows_idx = (random.sample(range(n_rows), self.sgd_sample) if isinstance(self.sgd_sample, int)
+                                   else random.sample(range(n_rows), int(self.sgd_sample * n_rows)))
+                self.x_train = x_train[sample_rows_idx]
+                self.y_train = y_train[sample_rows_idx]
+                self.n_rows = len(sample_rows_idx)
+            else:
+                self.x_train = x_train
+                self.y_train = y_train
+                self.n_rows = n_rows
+
+            self.y_pred = np.dot(self.x_train, self.weights)
+            residuals = self.y_pred - self.y_train
 
             # Вычисление функции потерь
-            mse = 1 / n_rows * sum((y_train - y_pred)**2)
+            mse = 1 / self.n_rows * sum((self.y_train - self.y_pred)**2)
             lasso = self.l1_coef * sum([abs(weight) for weight in self.weights])
             ridge = self.l2_coef * sum([weight ** 2 for weight in self.weights])
 
@@ -71,7 +101,7 @@ class MyLineReg:
             loss = losses[self.reg]
 
             # Вычисление градиента функции потерь
-            mse_grad = 2 / n_rows * residuals @ x_train
+            mse_grad = 2 / self.n_rows * residuals @ self.x_train
             lasso_grad = self.l1_coef * np.sign(self.weights)
             ridge_grad = 2 * np.array([self.l2_coef]) @ np.array([self.weights])
 
