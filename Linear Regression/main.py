@@ -5,7 +5,7 @@ from typing import Callable
 import random
 
 
-class MyLineReg:
+class LinearRegression:
     def __init__(self,
                  weights: list = [],
                  n_iter: int = 100,
@@ -17,11 +17,17 @@ class MyLineReg:
                  sgd_sample: float = None,
                  random_state: int = 42):
         """
-        Функция инициализирует объект класса
+        Инициализирует объект класса
 
-        :param weights: Изначальные веса модели
-        :param n_iter: Количество циклов градиентного спуска
-        :param learning_rate: Шаг градиентного спуска
+        :param weights: Веса модели
+        :param n_iter: Итерации градиентного спуска
+        :param learning_rate: Шаг в сторону антиградиента
+        :param metric: Метрика качества
+        :param reg: Регуляризация
+        :param l1_coef: Коэффициент лассо регуляризации
+        :param l2_coef: Коэффициент ридж регуляризации
+        :param sgd_sample: Размер мини-батча
+        :param random_state: Инициализатор числового генератора
         """
         self.n_iter = n_iter
         self.lr = learning_rate
@@ -31,6 +37,7 @@ class MyLineReg:
         self.y_train = None
         self.y_pred = None
         self.n_rows = None
+        self.score = None
 
         metrics = ['mae', 'mse', 'rmse', 'mape', 'r2']
         if metric not in metrics:
@@ -46,9 +53,18 @@ class MyLineReg:
         self.rs = random_state
         self.sgd_sample = sgd_sample
 
+    @staticmethod
+    def get_metric_score(y_train, y_pred, n_rows, metric: str):
+        metrics = {'mae': 1 / n_rows * sum(abs(y_train - y_pred)),
+                   'mse': 1 / n_rows * sum((y_train - y_pred) ** 2),
+                   'rmse': sqrt(1 / n_rows * sum((y_train - y_pred) ** 2)),
+                   'mape': 100 / n_rows * sum(abs(y_train - y_pred) / abs(y_train)),
+                   'r2': 1 - sum((y_train - y_pred) ** 2) / sum((y_train - np.mean(y_train)) ** 2)}
+        return metrics[metric]
+
     def fit(self, x_train, y_train, verbose=False) -> None:
         """
-        Функция обучает модель, функция потерь MSE, минимум функции
+        Обучает модель, функция потерь MSE, минимум функции
         определяется градиентным спуском
 
         :param x_train: Входные признаки
@@ -126,18 +142,16 @@ class MyLineReg:
                 # Перерасчет предсказаний с учетом новых весов
                 y_pred = np.dot(x_train, self.weights)
 
-                metrics = {'mae': 1 / n_rows * sum(abs(y_train - y_pred)),
-                           'mse': 1 / n_rows * sum((y_train - y_pred)**2),
-                           'rmse': sqrt(1 / n_rows * sum((y_train - y_pred)**2)),
-                           'mape': 100 / n_rows * sum(abs(y_train - y_pred) / abs(y_train)),
-                           'r2': 1 - sum((y_train - y_pred)**2) / sum((y_train - np.mean(y_train))**2)}
+                # Расчет метрики качества
+                self.score = self.__class__.get_metric_score(y_train, y_pred, n_rows, self.metric)
 
                 if i == 1:
-                    print(f'start | loss: {loss} | {self.metric}: {metrics[self.metric]}'
+                    print(f'start | loss: {loss} | '
+                          f'{self.metric}: {self.score}'
                           f' | learning_rate: {lr}')
                 elif i % verbose == 0:
                     print(f'{(i + 1) // verbose * verbose} | loss: {loss} '
-                          f'| {self.metric}: {metrics[self.metric]}'
+                          f'| {self.metric}: {self.score}'
                           f' | learning_rate: {lr}')
 
         self.y_pred = x_train @ self.weights
@@ -145,14 +159,7 @@ class MyLineReg:
         self.n_rows = n_rows
 
     def get_best_score(self) -> float:
-        metrics = {'mae': 1 / self.n_rows * sum(abs(self.y_train - self.y_pred)),
-                   'mse': 1 / self.n_rows * sum((self.y_train - self.y_pred) ** 2),
-                   'rmse': sqrt(1 / self.n_rows * sum((self.y_train - self.y_pred) ** 2)),
-                   'mape': 100 / self.n_rows *
-                           sum(abs(self.y_train - self.y_pred) / abs(self.y_train)),
-                   'r2': 1 - sum((self.y_train - self.y_pred) ** 2)
-                         / sum((self.y_train - np.mean(self.y_train)) ** 2)}
-        return metrics[self.metric]
+        return self.score
 
     def get_coef(self) -> list[float]:
         return self.weights[1:]
