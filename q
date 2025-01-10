@@ -1,0 +1,53 @@
+[33mcommit e9ebcd178684496f5ee0c91e322c15bf654bfda1[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m)[m
+Author: Kirill_Fridochkin <kfridochkin@mail.ru>
+Date:   Thu Jan 9 14:58:07 2025 +0300
+
+    added LogReg
+
+[33mcommit bc08d87eb86afb4c85e496ace2271b23307093ed[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: Kirill_Fridochkin <kfridochkin@mail.ru>
+Date:   Sat Jan 4 15:23:02 2025 +0300
+
+    Added SGD
+
+[33mcommit 0470197b59103163eaccc3329a02c47aea349fdd[m
+Author: Kirill_Fridochkin <kfridochkin@mail.ru>
+Date:   Thu Jan 2 15:31:34 2025 +0300
+
+    Added regularization (lasso, ridge, elasticnet) and dynamic learning rate
+
+[33mcommit 7de50e6184da36ba689795cbd17566178bfd768a[m
+Author: Kirill_Fridochkin <kfridochkin@mail.ru>
+Date:   Tue Dec 31 14:44:34 2024 +0300
+
+    Added different metrics for estimating
+
+[33mcommit 4d5c9cd0e396830c474180976526d401e40ceb7d[m
+Author: Kirill_Fridochkin <kfridochkin@mail.ru>
+Date:   Sun Dec 29 14:29:28 2024 +0300
+
+    Added correct docstrings and predicting functions
+
+[33mcommit 8831230afe1b513360a61ea2590301d7b6a7bc13[m
+Author: Kirill_Fridochkin <kfridochkin@mail.ru>
+Date:   Sat Dec 28 17:28:23 2024 +0300
+
+    Added fit and get_coeffs function. Used gradient learning
+
+[33mcommit e4ca1447f743c481c68a3c92c0d5dec9b3cd7c7d[m
+Author: Kirill_Fridochkin <kfridochkin@mail.ru>
+Date:   Sun Dec 22 19:53:50 2024 +0300
+
+    Added Linear Regression file
+
+[33mcommit 3081f241c0559837cf61b231c70c79f58ec4aa1d[m
+Author: Kirill_Fridochkin <kfridochkin@mail.ru>
+Date:   Sat Dec 21 15:16:37 2024 +0300
+
+    Adding README
+
+[33mcommit e03dac2bcda93239b04e94b58b4581b54b1c4439[m
+Author: Kirill Fridochkin <167013451+kirill1454@users.noreply.github.com>
+Date:   Sat Dec 21 15:12:03 2024 +0300
+
+    Initial commit
