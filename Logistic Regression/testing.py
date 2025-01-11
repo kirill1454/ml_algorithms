@@ -21,9 +21,9 @@ y_test = pd.Series(y_test)
 x_test.columns = [f'col_{col}' for col in x_test.columns]
 
 
-a = MyLogReg(n_iter=50, learning_rate=0.1, metric='accuracy')
+a = MyLogReg(n_iter=50, learning_rate=lambda x: 0.5 * (0.85 ** x), metric='roc_auc', reg='elasticnet',
+             sgd_sample=0.1)
 a.fit(x_train, y_train, verbose=10)
-print(a.get_best_score())
 
 
 
